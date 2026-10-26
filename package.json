@@ -3,13 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 3100",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -p 3100",
     "lint": "eslint"
   },
   "dependencies": {
     "next": "16.4.2",
+    "openid-client": "^6.8.8",
     "react": "19.3.0",
     "react-dom": "19.3.0"
   },

@@ -1,0 +1,37 @@
+# SSO Lab - local Keycloak Identity Provider
+# Documentation: https://www.keycloak.org/guides (container guide)
+#
+# Commands:
+#   docker compose up -d          start Keycloak in the background
+#   docker compose down           stop (realm config stays on disk)
+#   docker compose down -v        stop AND wipe realm data (reset to factory)
+#   docker compose logs -f keycloak   follow Keycloak logs
+services:
+  keycloak:
+    # Pinned to the current stable release for reproducibility.
+    image: quay.io/keycloak/keycloak:26.8.1
+    container_name: sso-lab-keycloak
+    # start-dev = development mode: quick to start, local H2 file database,
+    # HTTP (no TLS) on localhost. Never use start-dev in production.
+    command: start-dev
+    environment:
+      # Bootstraps the initial admin account. Only applied when the admin
+      # user does not exist yet (first start with an empty data volume).
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      # Enables /health, /health/live, /health/ready on the management port.
+      KC_HEALTH_ENABLED: "true"
+    ports:
+      # Main HTTP interface: admin console, login pages, OIDC + SAML endpoints.
+      - "8080:8080"
+      # Management interface (Keycloak 25+): health endpoints for monitoring.
+      # Host side is 19000 because this machine's port 9000 is already used
+      # by another project's container (zyratalk-next-websocket).
+      - "19000:9000"
+    volumes:
+      # Named Docker volume: realm configuration survives container recreation.
+      # Wipe it with: docker compose down -v
+      - keycloak_data:/opt/keycloak/data
+
+volumes:
+  keycloak_data:
